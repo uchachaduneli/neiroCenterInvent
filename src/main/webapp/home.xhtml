@@ -1,0 +1,384 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+<f:view>
+    <h:head>
+        <title>ინვენტარიზაცია</title>
+        <link rel="stylesheet" href="resources/css/login.css"/>
+        <link href="#{request.contextPath}/resources/imgs/logo.png" rel="icon" type="image/png"/>
+        <link href="#{request.contextPath}/resources/imgs/logo.png" rel="shortcut icon" type="image/png"/>
+        <style type="text/css">
+            .pnlGridClass :first-child td {
+                text-align: right;
+            }
+
+            table span, table div {
+                text-align: center;
+                font-size: 12px;
+                font-weight: normal !important;
+            }
+
+            .ui-datatable .ui-column-filter {
+                width: 65px;
+            }
+
+            .pnlGridClass {
+                font-size: 10px !important;
+            }
+
+            .pnlGridClass td input[type="text"] {
+                width: 100%;
+            }
+
+            .pnlGridClass td:first-child {
+                width: 120px;
+            }
+        </style>
+        <script type="text/javascript">
+
+
+            function enterDisable(event) {
+                try {
+                    var code = parseInt(event.keyCode);
+                    if (code === 13) {
+                        event.preventDefault();
+                        return false;
+                    }
+                    return true;
+                } catch (err) {
+                    return false;
+                }
+            }
+
+            $(document).ready(function () {
+                $('#searchInvestID').focus();
+                $('#submitDialog').click(function () {
+                    $('#barcodeInputTextId').val('');
+                    $('#barcodeInputTextId').focus();
+                });
+                $('#inventFormId').keypress(function (e) {
+                    if (e.which == 13) {
+                        $('#searchInvestID').select();
+                    }
+                });
+                $('#insertDlgFormId input').keypress(function (e) {
+                    return false;
+                    if (e.which == 13) {
+                        return false;
+                    }
+                });
+
+                //                    $('#submitDialog').click(function(){
+                //
+                //                    });
+            });
+        </script>
+    </h:head>
+    <h:body>
+        <center><img src="resources/imgs/logo_1.png"/></center>
+        <h:form id="inventFormId" prependId="false">
+            <p:growl id="growinvestId" showDetail="true" life="2000"/>
+            <p:contextMenu for="invenDataTableId" rendered="#{utilBean.admin}" style="width: 200px; font-size: 12px;">
+                <p:menuitem icon="ui-icon-pencil" value="რედაქტირება" action="#{investBean.selectIvent}"
+                            onclick="insertDLGwidg.show();"/>
+                <p:menuitem icon="ui-icon-clipboard" value="ისტორია" action="#{investBean.getChangedPersonsList}"
+                            update="@(#chabgedPersonsDialogFormId)" onclick="chabgedPersonsDialog.show();"/>
+                <p:menuitem icon="ui-icon-trash" value="ინვენტარის წაშლა" onclick="_confirmPrtDetDel.show();"/>
+            </p:contextMenu>
+            <p:panel style="height: 50px;">
+                <p:panelGrid columns="4" style="width:247px; float:left;" rendered="#{utilBean.admin}">
+                    <p:inputText id="searchInvestID" widgetVar="baCode" onkeyup="_tblList.filter();"
+                                 value="#{investBean.searchKey}"
+                                 style="font-weight: normal !important; font-size: 11px!important;"/>
+                    <p:commandButton type="submit" id="searchInvestId" value="ძებნა"
+                                     actionListener="#{investBean.searchForBarcode}" update="invenDataTableId"/>
+                </p:panelGrid>
+                <!--<p:commandButton value="." style="width: 0px; height: 0px; margin-left: 0.2%" />-->
+                <p:commandButton icon="ui-icon-power" value="გასვლა" action="#{utilBean.logout()}"
+                                 style=" font-weight: normal !important; font-size: 14px!important; float: right;"/>
+                <p:commandButton icon="ui-icon-lightbulb" value="ახალი სეზონი" onclick="_confirmNewSeason.show();"
+                                 rendered="#{utilBean.admin}"
+                                 style=" font-weight: normal !important; font-size: 14px!important; margin-right: 10px; float: right;"/>
+                <p:commandButton icon="ui-icon-person" value="მომხმარებლები" oncomplete="usersActionListWidget.show();"
+                                 update="@(#usersActionListFrmID)"
+                                 action="#{utilBean.loadWorkers()}" rendered="#{utilBean.admin}"
+                                 style=" font-weight: normal !important; font-size: 14px!important; margin-right: 10px; float: right;"/>
+                <p:commandButton icon="ui-icon-plusthick" value="ინვენტარის დამატება"
+                                 action="#{investBean.investDetails()}" onclick="insertDLGwidg.show();"
+                                 rendered="#{utilBean.admin}"
+                                 style=" font-weight: normal !important; font-size: 14px!important; width: 200px; margin-right: 10px; float: right;"/>
+
+            </p:panel>
+
+            <h:commandLink style="display: block;height: 30px;margin-left: 5px; position: absolute; width: 30px;">
+                <p:graphicImage value="/resources/imgs/excel.png"
+                                title="xls #{langBean.ka(' formatSi eqsporti (Zebnis Sedegis)')}"/>
+                <p:dataExporter type="xls" target="invenDataTableId" fileName="Inventar" encoding="UTF-8"
+                                postProcessor="#{investBean.postProcessXLS}"/>
+            </h:commandLink>
+            <h:outputText id="sumCostOutputId"
+                          style="display: block; margin-top: 8px; height: 30px;margin-left: 100px; position: absolute; width: 300px;"
+                          value="#{investBean.totalCost}">
+                <f:convertNumber pattern="ჯამური ღირებულება: 0.00"/>
+            </h:outputText>
+
+            <p:ajaxStatus style="position:absolute;right: 45%; bottom:86%;">
+                <f:facet name="start">
+                    <p:graphicImage value="/resources/imgs/loadng.GIF"/>
+                </f:facet>
+                <f:facet name="complete">
+                    <h:outputText value=""/>
+                </f:facet>
+            </p:ajaxStatus>
+
+            <p:dataTable id="invenDataTableId" selectionMode="single" selection="#{investBean.selectedInvent}"
+                         emptyMessage="#{langBean.ka('Canaweri ar moiZebna')}" editable="true"
+                         value="#{investBean.investDetails}" filteredValue="#{investBean.filtered}"
+                         rowKey="#{var.id}" paginator="true" rows="10" var="var" widgetVar="_tblList"
+                         style="text-align: center;"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,20,30,50,100,200">
+                <p:ajax event="filter" update="@(#sumCostOutputId)" listener="#{investBean.filterListener}"/>
+                <p:column style="width: 120px;" headerText="შტრიხკოდი" filterMatchMode="exact"
+                          filterBy="#{var.barcode}">
+                    <h:outputText value="#{var.barcode}"/>
+                </p:column>
+                <p:column style="width: 145px;" headerText="პასუხ. პირი" filterMatchMode="contains"
+                          filterBy="#{var.responsiblePerson}">
+                    <h:outputText value="#{var.responsiblePerson != 'null' ? var.responsiblePerson : ' '}"/>
+                </p:column>
+                <p:column style="width: 165px;" headerText="ნივთი" filterMatchMode="contains" filterBy="#{var.item}">
+                    <h:outputText value="#{var.item != 'null' ? var.item : ' '}"/>
+                </p:column>
+                <p:column style="width: 145px;" headerText="აღწერა" filterMatchMode="contains"
+                          filterBy="#{var.description}">
+                    <h:outputText value="#{var.description != 'null' ? var.description : ' '}"/>
+                </p:column>
+                <p:column style="width: 125px;" headerText="ერთ ფასი" filterMatchMode="contains"
+                          filterBy="#{var.unitPrice}">
+                    <h:outputText value="#{var.unitPrice != null ? var.unitPrice : ' '}"/>
+                </p:column>
+                <p:column style="width: 125px;" headerText="რ-ბა" filterMatchMode="contains" filterBy="#{var.count}">
+                    <h:outputText value="#{var.count != null ? var.count : ' '}"/>
+                </p:column>
+                <p:column style="width: 125px;" headerText="ჯამ.ღირებ." filterMatchMode="contains"
+                          filterBy="#{var.totalCost}">
+                    <h:outputText value="#{var.totalCost != null ? var.totalCost : ' '}"/>
+                </p:column>
+                <p:column style="width: 50px;" headerText="ახალი სტატ." filterMatchMode="contains"
+                          filterBy="#{var.status_new}">
+                    <h:outputText value="#{var.status_new != 'null' ? var.status_new : ' '}"/>
+                </p:column>
+                <p:column style="width: 25px;" headerText="ძველი სტატ." filterMatchMode="contains"
+                          filterBy="#{var.status_old}">
+                    <h:outputText value="#{var.status_old != 'null' ? var.status_old : ' '}"/>
+                </p:column>
+                <p:column style="width: 65px;" headerText="დეპარტ." filterMatchMode="contains"
+                          filterBy="#{var.department}">
+                    <h:outputText value="#{var.department != 'null' ? var.department : ' '}"/>
+                </p:column>
+                <p:column style="width: 65px;" headerText="სართული" filterMatchMode="contains" filterBy="#{var.city}">
+                    <h:outputText value="#{var.city != 'null' ? var.city : ' '}"/>
+                </p:column>
+                <p:column style="width: 65px;" headerText="ოთახის N" filterMatchMode="contains"
+                          filterBy="#{var.stelaji}">
+                    <h:outputText value="#{var.stelaji != 'null' ? var.stelaji : ' '}"/>
+                </p:column>
+                <p:column style="width: 65px;" headerText="შენიშვნა" filterMatchMode="contains" filterBy="#{var.note}">
+                    <h:outputText value="#{var.note != 'null' ? var.note : ' '}"/>
+                </p:column>
+                <p:ajax event="rowDblselect" listener="#{investBean.selectIvent}" rendered="#{utilBean.admin}"
+                        disabled="#{!utilBean.admin}"
+                        oncomplete="insertDLGwidg.show();"/>
+            </p:dataTable>
+
+            <p:confirmDialog id="confrmDialogId" message="დაადასტურეთ ინვენტარის წაშლა" style="font-size: 12px;"
+                             header="ინვენტარის წაშლა" severity="alert" widgetVar="_confirmPrtDetDel">
+                <p:commandButton tabindex="2" value="დიახ" actionListener="#{investBean.removeInvestElement}"
+                                 oncomplete="_confirmPrtDetDel.hide()" update="@(#invenDataTableId)"/>
+                <p:commandButton tabindex="1" value="არა" onclick="_confirmPrtDetDel.hide()" type="button"/>
+            </p:confirmDialog>
+
+            <p:confirmDialog width="550" message="დარწმუნებული ხართ რომ გსურთ მომხმარებლის წაშლა"
+                             rendered="#{utilBean.admin}"
+                             header="მომხმარებლის წაშლა" severity="alert" widgetVar="confirmOfUserDeletion">
+                <p:commandButton value="დიახ" update="@(#usersActionListFrmID)" action="#{utilBean.deleteUser()}"/>
+                <p:commandButton value="არა" onclick="confirmOfUserDeletion.hide();"/>
+            </p:confirmDialog>
+
+            <p:confirmDialog message="დაადასტურეთ ინვენტარიზაციის ახალი სეზონის დაწყება" style="font-size: 12px;"
+                             header="ახალი სეზონის დაწყება" severity="alert" widgetVar="_confirmNewSeason">
+                <p:commandButton tabindex="2" value="ვადასტურებ" actionListener="#{investBean.startNewSeazon()}"
+                                 oncomplete="_confirmNewSeason.hide()" update="@form"/>
+                <p:commandButton tabindex="1" value="გაუქმება" onclick="_confirmNewSeason.hide()" type="button"/>
+            </p:confirmDialog>
+        </h:form>
+        <p:dialog widgetVar="insertDLGwidg" id="insertDlgId" resizable="false" width="500">
+            <h:form id="insertDlgFormId" prependId="false">
+                <p:panelGrid columns="2" style="width: 100%;" styleClass="pnlGridClass">
+
+                    <h:outputText value="შტრიხკოდი"/>
+                    <p:inputText onkeypress="enterDisable(event)" value="#{investBean.details.barcode}"
+                                 id="barcodeInputTextId"/>
+
+                    <h:outputText value="პასუხისმგებელი პირი*"/>
+                    <p:inputText value="#{investBean.details.responsiblePerson}"/>
+
+                    <h:outputText value="ნივთი"/>
+                    <p:inputText value="#{investBean.details.item}"/>
+
+                    <h:outputText value="აღწერა"/>
+                    <p:inputText value="#{investBean.details.description}"/>
+
+                    <h:outputText value="ერთეულის ფასი"/>
+                    <p:inputText value="#{investBean.details.unitPrice}"/>
+
+                    <h:outputText value="რაოდენობა"/>
+                    <p:inputText value="#{investBean.details.count}"/>
+
+                    <h:outputText value="ჯამური ღირებულება"/>
+                    <p:inputText value="#{investBean.details.totalCost}"/>
+
+                    <h:outputText value="ახალი სტატუსი"/>
+                    <p:inputText value="#{investBean.details.status_new}"/>
+
+                    <h:outputText value="ძველი სტატუსი"/>
+                    <p:inputText value="#{investBean.details.status_old}"/>
+
+                    <h:outputText value="დეპარტ."/>
+                    <p:inputText value="#{investBean.details.department}"/>
+
+                    <h:outputText value="სართული"/>
+                    <p:inputText value="#{investBean.details.city}"/>
+
+                    <h:outputText value="ოთახის N"/>
+                    <p:inputText value="#{investBean.details.stelaji}"/>
+
+                    <h:outputText value="შენიშვნა"/>
+                    <p:inputText value="#{investBean.details.note}"/>
+
+                </p:panelGrid>
+                <center><p:commandButton id="submitDialog" value="დამახსოვრება" icon="ui-icon-disk"
+                                         onclick="setTimeout(function() {
+                                                         $('#searchInvestID').select()
+                                                     }, 500)" action="#{investBean.saveAdnUpdateElement()}"
+                                         style=" font-weight: normal; width: 50%; margin: 10px;"
+                                         update="@(#inventFormId)"/>
+                </center>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog widgetVar="chabgedPersonsDialog" resizable="false" style="max-height: 600px; overflow: auto;"
+                  width="500">
+            <h:form id="chabgedPersonsDialogFormId" prependId="false">
+                <p:dataTable value="#{investBean.changedPersons}" var="obj">
+                    <f:facet name="header">
+                        <h:outputText value="ინვენტარის გადაცემის ისტორია"/>
+                    </f:facet>
+                    <p:column headerText="პიროვნებიდან" filterBy="#{obj.oldPerson}" filterMatchMode="contains">
+                        <h:outputText value="#{obj.oldPerson}"/>
+                    </p:column>
+                    <p:column headerText="პიროვნებას" filterBy="#{obj.responsiblePerson}" filterMatchMode="contains">
+                        <h:outputText value="#{obj.responsiblePerson}"/>
+                    </p:column>
+                    <p:column headerText="გადაცემის თარიღი" filterBy="#{obj.insertDate}" filterMatchMode="contains">
+                        <h:outputText value="#{obj.insertDate}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog widgetVar="usersActionListWidget" rendered="#{utilBean.admin}" modal="true"
+                  id="usersActionListDlgId" header="თანამშრომლები"
+                  resizable="false" style="max-height: 600px; overflow: auto;" width="800">
+            <h:form id="usersActionListFrmID" prependId="false" title="მოქმედებებისთვის გამოიყენეთ კონტექსტური მენიუ">
+                <p:growl life="5000" showDetail="true"/>
+
+                <p:contextMenu for="usersDataTableId">
+                    <p:menuitem value="რედაქტირება" icon="ui-icon-pencil" update="@(#insertUserDlgFrmID)"
+                                action="#{utilBean.editUser()}" onclick="insertUserDlgwidg.show();"/>
+                    <p:menuitem value="წაშლა" icon="ui-icon-trash" onclick="confirmOfUserDeletion.show();"/>
+                </p:contextMenu>
+                <center>
+                    <p:dataTable id="usersDataTableId"
+                                 value="#{utilBean.workers}"
+                                 var="usr"
+                                 styleClass="mainTableStyleClass"
+                                 rowKey="#{usr.id}"
+                                 selection="#{utilBean.axaliUseri}"
+                                 selectionMode="single"
+                                 emptyMessage="ჩანაწერი არ მოიძებნა"
+                                 style="width: 100%;">
+                        <f:facet name="header">
+                            <p:commandButton id="addUserfromdlgButnID" icon="ui-icon-person" value="დამატება"
+                                             action="#{utilBean.initAddUser()}"
+                                             oncomplete="insertUserDlgwidg.show();" update="@(#insertUserDlgFrmID)"
+                                             style="margin-left: 10px; float: left; font-size: 15px!important;font-weight: normal;"/>
+                        </f:facet>
+                        <p:column headerText="ID">
+                            <h:outputText value="#{usr.id}"/>
+                        </p:column>
+                        <p:column headerText="ნიკი">
+                            <h:outputText value="#{usr.userName}"/>
+                        </p:column>
+                        <p:column headerText="სახელი, გვარი">
+                            <h:outputText value="#{usr.description}"/>
+                        </p:column>
+                        <p:column headerText="ტიპი">
+                            <h:outputText value="#{usr.typeName}"/>
+                        </p:column>
+                    </p:dataTable>
+                </center>
+                <p:commandButton value="დახურვა" icon="ui-icon-close"
+                                 style=" float: right; font-weight: normal !important; margin-top: 5px;font-size: 14px;"
+                                 onclick="usersActionListWidget.hide();"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog widgetVar="insertUserDlgwidg" modal="true" id="insertUserDlgId"
+                  header="თანამშრომლის დამატება/რედაქტირება" resizable="false" width="500">
+            <h:form id="insertUserDlgFrmID" prependId="false">
+                <p:growl life="5000" showDetail="true" id="inserting_user_growl_id"/>
+                <p:panelGrid columns="2" style="width: 100%;">
+                    <h:outputLabel value="პაროლის შეცვლა" rendered="#{utilBean.userEdit}"/>
+                    <p:selectBooleanCheckbox value="#{utilBean.axaliUseri.editPass}" rendered="#{utilBean.userEdit}">
+                        <p:ajax update="@(#insertUserDlgFrmID)" event="change"/>
+                    </p:selectBooleanCheckbox>
+                    <h:outputLabel value="ნიკი"/>
+                    <h:panelGroup>
+                        <p:inputText value="#{utilBean.axaliUseri.userName}"
+                                     title="შეამოწმეთ ნიკის თავისუფლება ღილაკის მეშვეობით(მხოლოდ ახალი თანამშრომლის დამატებისას)"
+                                     style="width: 80%!important;"/>
+                        <p:commandButton action="#{utilBean.checkUserName()}" icon="ui-icon-check" update="@form"
+                                         title="შემოწმება"/>
+                    </h:panelGroup>
+
+                    <h:outputLabel value="პაროლი" rendered="#{utilBean.axaliUseri.editPass}"/>
+                    <p:password value="#{utilBean.axaliUseri.password}" style="width: 100%;"
+                                rendered="#{utilBean.axaliUseri.editPass}"/>
+
+                    <h:outputLabel value="გაიმეორეთ პაროლი" rendered="#{utilBean.axaliUseri.editPass}"/>
+                    <p:password value="#{utilBean.passwordConrfm}" style="width: 100%;"
+                                rendered="#{utilBean.axaliUseri.editPass}"/>
+
+                    <h:outputLabel value="სახელი, გვარი"/>
+                    <p:inputText value="#{utilBean.axaliUseri.description}" style="width: 100%;"/>
+
+                    <h:outputLabel value="კატეგორია"/>
+                    <p:selectOneMenu effect="fade" value="#{utilBean.axaliUseri.typeId}" style="width: 70%;">
+                        <f:selectItems value="#{utilBean.userStatuses}"/>
+                    </p:selectOneMenu>
+
+                </p:panelGrid>
+                <center>
+                    <p:commandButton id="addUserDialogButtonID" value="შენახვა" update="@(#usersActionListFrmID)"
+                                     action="#{utilBean.userAction()}" icon="ui-icon-disk"
+                                     style=" font-weight: normal !important; margin-top: 5px; font-size: 14px!important; width: 50%;"/>
+                </center>
+            </h:form>
+        </p:dialog>
+
+    </h:body>
+</f:view>
+</html>

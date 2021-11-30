@@ -1,0 +1,246 @@
+.header {
+    /*background:#f6a828;*/
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    background: url('../imgs/darkgrain.png') center repeat-x;
+    /*    -moz-box-shadow: 0px 0px 45px 0px #000;
+        -webkit-box-shadow: 0px 0px 45px 0px #000;
+        box-shadow: 0px 0px 45px 0px #f6a828;*/
+}
+
+.logo {
+    width: 130px;
+    height: 124px;
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 2%;
+}
+
+.slogan {
+    margin-top: 10px;
+    width: 100%;
+    min-height: 30px;
+    color: #b20018;
+    font-weight: bold;
+    font-size: 36px;
+    position: absolute;
+    font-family: sans-serif;
+}
+
+.menu {
+    clear: both;
+    width: 500px;
+    height: 30px;
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+.menu ul {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+.menu ul li {
+    float: left;
+    /*width: 200px;*/
+}
+
+.menu ul li a:hover {
+    text-decoration: underline;
+}
+
+.main_content {
+    width: 99%;
+    min-height: 600px;
+    /*overflow: hidden;*/
+    margin: 20px auto;
+}
+
+.footer {
+    height: 40px;
+    /*background: #f6a828;*/
+    width: 100%;
+    /*background: url('../imgs/header_bg.png') center repeat-x;*/
+    /*    -moz-box-shadow: 0px 0px 45px 0px #000;
+        -webkit-box-shadow: 0px 0px 45px 0px #000;
+        box-shadow: 0px 0px 45px 0px #f6a828;*/
+}
+
+.footer span {
+    display: block;
+    padding: 10px 0px;
+    color: gray;
+    margin: 0px 0px 0px 50px;
+}
+
+.ui-dialog-title {
+    font-size: 16px !important;
+}
+
+.ui-dialog.ui-widget-content .ui-dialog-titlebar-close {
+    margin-top: 0px;
+}
+
+/*.ui-widget .ui-widget { font-size: 1em; }*/
+
+#companiesDataTableId table {
+    text-align: center;
+}
+
+.centerTableContent table {
+    text-align: center;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #F9F5FD;
+    font-size: 14px;
+}
+
+.ui-state-error {
+    background: none !important;
+    color: #362b36 !important;
+}
+
+.ui-growl-item {
+    font-size: 14px;
+}
+
+.ui-button-text {
+    font-weight: normal;
+}
+
+.mainTableStyleClass .ui-datatable-header {
+    /*background: #f6a828;*/
+    height: 36px;
+}
+
+.pnlGridClass tr td:first-child {
+    width: 37%;
+    text-align: center;
+}
+
+.ui-widget-header {
+    color: #3F6A8F;
+    text-decoration: none;
+}
+
+span.case-dttbl-paginator-facet {
+    height: 30px;
+    display: block;
+}
+
+.ui-button .ui-button-text {
+    font-family: normal;
+    font-size: 14px;
+}
+
+.ui-selectonemenu {
+    font-family: normal;
+    font-size: 14px !important;
+}
+
+.ui-inputfield {
+    font-family: normal;
+    font-size: 14px !important;
+}
+
+.ui-fieldset-toggleable .ui-fieldset-legend {
+    font-size: 14px !important;
+    font-weight: normal !important;
+}
+
+#operatorLeadsTableId table {
+    text-align: center;
+    font-size: 12px !important;
+}
+
+#departsDataTableId table {
+    text-align: center;
+}
+
+#usersDataTableId table {
+    text-align: center;
+}
+
+.ui-fileupload-files {
+    border: cyan;
+}
+
+.radioTable tr td {
+    width: 150px !important;
+    border: none;
+}
+
+.pnlGridClass tr td input[type="text"], .pnlGridClass tr td .ui-selectonemenu, .pnlGridClass tr td textarea {
+    width: 100% !important;
+}
+
+#addConctrStartDateId_input {
+    width: 40% !important;
+}
+
+#addConctrEndDateId_input {
+    margin-left: 10px;
+    width: 40% !important;
+}
+
+.interestedDepartsStyleClass tr td {
+    border: none;
+}
+
+#sailDocsTableId table {
+    font-size: 14px;
+    text-align: center;
+}
+
+.fileupload-content table {
+    border-color: cyan !important;
+}
+
+.filterCalendarsStyleClass input {
+    width: 68px;
+}
+
+.leadAlert td {
+    /*background-color: #6CE26C !important;*/
+    background-color: #ff945f;
+}
+
+.limitedAlertClass {
+    background-color: #6CE26C !important;
+}
+
+.ui-column-filter {
+    width: 90px !important;
+}
+
+.ui-selectonemenu-filter-container {
+    width: 98% !important;
+}
+
+.ui-inputtext {
+    border-color: inherit;
+    font-weight: inherit;
+    cursor: text !important;
+    *font-weight: normal; /*IE7 hack*/
+}
+
+.homedateFilters input {
+    width: 86px;
+}
+
+.template-upload {
+    width: 300px !important;
+}
+
+.userFileUploadClass {
+    width: 300px !important;
+}
+
+.userFileUploadClass table {
+    width: 300px !important;
+}

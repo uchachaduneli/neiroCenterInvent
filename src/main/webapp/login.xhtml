@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+>
+<h:head>
+    <title>ინვენტარიზაცია</title>
+    <link rel="stylesheet" href="resources/css/login.css"/>
+    <link href="#{request.contextPath}/resources/imgs/logo.png" rel="icon" type="image/png"/>
+    <link href="#{request.contextPath}/resources/imgs/logo.png" rel="shortcut icon" type="image/png"/>
+</h:head>
+<h:body>
+    <center><img src="resources/imgs/logo_1.png"/>
+        <br/><br/>
+        <div style="width: 500px;"><h1>ინვენტარიზაცია</h1></div>
+    </center>
+    <h:form id="login" prependId="false">
+        <p:growl id="loginGrowlId" escape="false" showDetail="true" sticky="true"/>
+        <h3>ავტორიზაცია</h3>
+        <fieldset id="inputs">
+            <h:inputText id="username" class="loginInputs" value="#{authBean.userName}"/>
+            <h:inputSecret id="password" class="loginInputs" value="#{authBean.password}"/>
+        </fieldset>
+        <fieldset id="actions">
+            <p:commandButton id="loginButtonId"
+                             action="#{authBean.login()}"
+                             value="შესვლა" update="@form"/>
+        </fieldset>
+        <p:watermark for="password" value="**********"/>
+        <p:watermark for="username" value="მომხმარებელი"/>
+    </h:form>
+
+</h:body>
+</html>
+
+
